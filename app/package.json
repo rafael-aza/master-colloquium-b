@@ -1,0 +1,19 @@
+{
+  "name": "three-tier-demo-app",
+  "version": "1.0.0",
+  "description": "Minimal Express + mysql2 app proving ALB -> EC2 -> RDS connectivity for the Master Colloquium IaC vs Manual experiment.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "license": "MIT"
+}
