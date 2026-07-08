@@ -1,11 +1,19 @@
-# ─── AMI Data Source — Ubuntu 22.04 LTS (Canonical) ──────────────────────────
+# ─── AMI Data Source — Ubuntu 24.04 LTS (Canonical) ──────────────────────────
+# NOTE: originally pinned to 22.04 (jammy), but the plain 22.04 SSD AMI listing
+# was unavailable in the AWS console at the time of the manual deployment run
+# (see note.md decision #7). Switched to 24.04 (noble) for BOTH environments
+# to keep the manual vs Terraform comparison fair (same OS/AMI family).
+# NOTE 2: 24.04-era Canonical AMIs are published under the "hvm-ssd-gp3" path,
+# not "hvm-ssd" (that was the 22.04-era convention) — confirmed via
+# `aws ec2 describe-images`. `terraform plan` caught this immediately
+# ("Your query returned no results") before any resources were touched.
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
 
   filter {

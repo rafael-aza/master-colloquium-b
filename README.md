@@ -9,6 +9,18 @@ A comparative study of **Infrastructure as Code (Terraform)** versus **manual AW
 
 > To what extent does IaC (Terraform) improve the deployment speed and operational consistency of AWS cloud resources compared to manual provisioning?
 
+## Results (2026-07-08 run)
+
+Both environments were built to the same spec and verified end-to-end (`ALB → EC2 → RDS`):
+
+| Metric | Manual (Click-Ops) | Terraform (IaC) |
+|---|---|---|
+| Total deployment time | ~116 min (estimated) | **15m 22s** (exact) |
+| Configuration errors | 3 (found manually, mid-build) | 1 (caught by `terraform plan`, zero cloud impact) |
+| Drift check | n/a | `terraform plan` → "No changes" ✅ |
+
+Full results, timings, and analysis: [`docs/report.md`](docs/report.md). Complete field-by-field build journal (decisions, errors, resource IDs): [`note.md`](note.md).
+
 ## What Gets Deployed
 
 A production-shaped **3-tier web architecture**, deployed twice (once via Terraform, once by hand) for comparison:
@@ -43,12 +55,14 @@ Verified in **WSL2 Ubuntu**:
 
 | Tool | Version |
 |---|---|
-| Terraform | 1.15.7 |
-| AWS CLI | 2.35 |
-| Node.js | 18.20 |
-| Git | 2.43 |
+| Terraform | 1.15.6 |
+| AWS CLI | 2.35.9 |
+| Git | 2.43.0 |
+| Node.js (local, for `app/` unit tests only) | 18.x |
 
-AWS credentials configured (`aws configure`) with permissions for VPC, EC2, ELB, RDS, and IAM.
+AWS credentials configured (`aws configure`) with permissions for VPC, EC2, ELB, RDS, and IAM. Node.js is **not** required locally to deploy — EC2 instances install Node 18.x themselves via the user-data bootstrap script.
+
+> **AMI note:** the base image is Ubuntu **24.04 LTS** ("noble"), not 22.04 as originally planned — the plain 22.04 SSD AMI became unavailable in the AWS Console during deployment. See `docs/architecture.md` §4.1 and `docs/report.md` §4.4 for details.
 
 ## Usage
 

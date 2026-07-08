@@ -22,6 +22,8 @@
 
 ## 1. System Architecture Overview
 
+> **Status (2026-07-08):** this architecture has been fully built and verified in both environments (manual Click-Ops and Terraform). Actual results, timings, and deviations from this design (notably the AMI version change, §4.1) are documented in `docs/report.md` §4 and the full build journal in `note.md`.
+
 The architecture follows a strict 3-tier separation: a **public network tier** (load balancer), a **private compute tier** (application servers), and a **private data tier** (database). Resources span two Availability Zones for fault tolerance.
 
 ```mermaid
@@ -154,7 +156,9 @@ The EC2 launch template injects a Bash script that runs at first boot. Terraform
 
 ### 4.1 User-Data Script (Reference)
 
-> **Base image:** Ubuntu 22.04 LTS AMI (so the `apt-get` commands below apply). If an Amazon Linux 2023 AMI is used instead, replace `apt-get` with `dnf` and adjust the NodeSource setup accordingly.
+> **Base image:** Ubuntu **24.04 LTS** ("noble") AMI (so the `apt-get` commands below apply). If an Amazon Linux 2023 AMI is used instead, replace `apt-get` with `dnf` and adjust the NodeSource setup accordingly.
+>
+> **Deviation from original plan:** this design originally specified Ubuntu 22.04 LTS ("jammy"). During the actual deployment (2026-07-08), the plain 22.04 SSD AMI listing was no longer selectable in the AWS Console AMI browser (only bundled variants like "22.04 LTS with SQL Server 2022" remained), so **both** environments were switched to 24.04 LTS for a fair, consistent comparison. This also required updating the Terraform AMI data-source filter from the `hvm-ssd` image path (22.04-era) to `hvm-ssd-gp3` (24.04-era) — `terraform plan` caught the outdated path immediately (`Error: Your query returned no results`) before any resource was created. Full detail in `docs/report.md` §4.4 and `note.md`.
 
 ```bash
 #!/bin/bash
@@ -347,7 +351,7 @@ Stopwatch starts at step 1, stops when `curl` on the ALB DNS returns HTTP 200. E
 | Application Load Balancer | Internet-facing | 1 each | `tf-alb` / `manual-alb` |
 | ALB Listener | HTTP :80 | 1 each | — |
 | Target Group | HTTP :4000 (health path /health) | 1 each | `tf-tg` / `manual-tg` |
-| Launch Template | `t3.micro`, Ubuntu 22.04 LTS | 1 each | `tf-lt` / `manual-lt` |
+| Launch Template | `t3.micro`, Ubuntu 24.04 LTS | 1 each | `tf-lt` / `manual-lt` |
 | Auto Scaling Group | Min:1 Max:2 Desired:2 | 1 each | `tf-asg` / `manual-asg` |
 | EC2 Instances | `t3.micro` | 2 each (via ASG) | managed by ASG |
 | DB Subnet Group | Covers both DB subnets | 1 each | `tf-db-subnet-group` / `manual-db-subnet-group` |
