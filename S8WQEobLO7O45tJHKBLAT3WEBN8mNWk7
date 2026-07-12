@@ -1,0 +1,5 @@
+[33m74c36c3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Add deployment screenshots - Manual (Part A) and Terraform (Part B)
+[33mabac9e3[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Complete 3-tier manual and Terraform deployment runs with full results
+[33meb68687[m Add 15-slide presentation (PowerPoint) with speaker notes and generator script
+[33m21c5ac4[m Add 3-tier AWS IaC project: Terraform modules, Node app, TDD tests, docs
+[33m7ec53f7[m Initial commit
